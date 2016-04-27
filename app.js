@@ -31,7 +31,7 @@ bot.add('/google-oauth2',  [
     if (!results.response) return session.endDialog();
     session.userData.scope = results.response.split(",");
     oauth2Client = new OAuth2(session.userData.client_id, session.userData.client_secret, process.env.GOOGLE_OAUTH2_REDIRECT);
-    url = oauth2Client.generateAuthUrl({access_type: 'offline', scope: results.response});
+    url = oauth2Client.generateAuthUrl({access_type: 'offline', scope: session.userData.scope});
     builder.Prompts.text(session, "Please go to "+url+" then parse your code here");
   },
   function (session, results) {
