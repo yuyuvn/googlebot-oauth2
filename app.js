@@ -19,20 +19,24 @@ bot.add('/google-oauth2',  [
       You should add "+process.env.GOOGLE_OAUTH2_REDIRECT+" to your host list");
   },
   function (session, results) {
+    if (results.response === null) return session.endDialog();
     session.userData.client_id = results.response
     builder.Prompts.text(session, "What is your CLIENT_SECRET?");
   },
   function (session, results) {
+    if (results.response === null) return session.endDialog();
     session.userData.client_secret = results.response
     builder.Prompts.text(session, "What scopes do you want?");
     oauth2Client = new OAuth2(session.userData.client_id, session.userData.client_secret, process.env.GOOGLE_OAUTH2_REDIRECT);
   },
   function (session, results) {
+    if (results.response === null) return session.endDialog();
     session.userData.scope = results.response.split(",")
     url = oauth2Client.generateAuthUrl({access_type: 'offline', scope: results.response})
     builder.Prompts.text(session, "Please go to "+url+" then parse your code here");
   },
   function (session, results) {
+    if (results.response === null) return session.endDialog();
     oauth2Client.getToken(results.response, function(err, tokens){
       if (err) {
         session.send('Error: %s', err);
