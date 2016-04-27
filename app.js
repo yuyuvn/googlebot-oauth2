@@ -2,9 +2,8 @@ var restify = require('restify');
 var builder = require('botbuilder');
 
 var server = restify.createServer();
-var google = require('googleapis')
-var OAuth2 = google.auth.OAuth2
-var oauth2Client = null
+var google = require('googleapis');
+var OAuth2 = google.auth.OAuth2;
 var bot = new builder.BotConnectorBot();
 bot.add('/', new builder.CommandDialog()
   .matches('^gen google oauth2?', builder.DialogAction.beginDialog('/google-oauth2'))
@@ -19,24 +18,25 @@ bot.add('/google-oauth2',  [
       You should add "+process.env.GOOGLE_OAUTH2_REDIRECT+" to your host list");
   },
   function (session, results) {
-    if (results.response === null) return session.endDialog();
+    if (!results.response) return session.endDialog();
     session.userData.client_id = results.response
     builder.Prompts.text(session, "What is your CLIENT_SECRET?");
   },
   function (session, results) {
-    if (results.response === null) return session.endDialog();
+    if (!results.response) return session.endDialog();
     session.userData.client_secret = results.response
     builder.Prompts.text(session, "What scopes do you want?");
-    oauth2Client = new OAuth2(session.userData.client_id, session.userData.client_secret, process.env.GOOGLE_OAUTH2_REDIRECT);
   },
   function (session, results) {
-    if (results.response === null) return session.endDialog();
-    session.userData.scope = results.response.split(",")
-    url = oauth2Client.generateAuthUrl({access_type: 'offline', scope: results.response})
+    if (!results.response) return session.endDialog();
+    session.userData.scope = results.response.split(",");
+    oauth2Client = new OAuth2(session.userData.client_id, session.userData.client_secret, process.env.GOOGLE_OAUTH2_REDIRECT);
+    url = oauth2Client.generateAuthUrl({access_type: 'offline', scope: results.response});
     builder.Prompts.text(session, "Please go to "+url+" then parse your code here");
   },
   function (session, results) {
-    if (results.response === null) return session.endDialog();
+    if (!results.response) return session.endDialog();
+    oauth2Client = new OAuth2(session.userData.client_id, session.userData.client_secret, process.env.GOOGLE_OAUTH2_REDIRECT);
     oauth2Client.getToken(results.response, function(err, tokens){
       if (err) {
         session.send('Error: %s', err);
