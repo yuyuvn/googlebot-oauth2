@@ -29,7 +29,10 @@ bot.add('/google-oauth2',  [
   },
   function (session, results) {
     if (!results.response) return session.endDialog();
-    session.userData.scope = results.response.split(",");
+    scopes = results.response.split(",").map(function(value){
+      return value.trim().replace(/<.*?>/, "");
+    });
+    session.userData.scope = scopes;
     oauth2Client = new OAuth2(session.userData.client_id, session.userData.client_secret, process.env.GOOGLE_OAUTH2_REDIRECT);
     url = oauth2Client.generateAuthUrl({access_type: 'offline', scope: session.userData.scope});
     builder.Prompts.text(session, "Please go to "+url+" then parse your code here");
