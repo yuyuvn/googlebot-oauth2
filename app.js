@@ -5,6 +5,11 @@ var server = restify.createServer();
 var google = require('googleapis');
 var OAuth2 = google.auth.OAuth2;
 var bot = new builder.BotConnectorBot();
+
+function endDialog(session) {
+  session.send("ok");
+  session.endDialog();
+}
 bot.add('/', new builder.CommandDialog()
   .matches('^gen google oauth2?', builder.DialogAction.beginDialog('/google-oauth2'))
   .matches('^quit', builder.DialogAction.endDialog())
@@ -18,17 +23,17 @@ bot.add('/google-oauth2',  [
       You should add "+process.env.GOOGLE_OAUTH2_REDIRECT+" to your host list");
   },
   function (session, results) {
-    if (!results.response) return session.endDialog();
-    session.userData.client_id = results.response
+    if (!results.response) return endDialog(session);
+    session.userData.client_id = results.response.trim();
     builder.Prompts.text(session, "What is your CLIENT_SECRET?");
   },
   function (session, results) {
-    if (!results.response) return session.endDialog();
-    session.userData.client_secret = results.response
+    if (!results.response) return endDialog(session);
+    session.userData.client_secret = results.response.trim();
     builder.Prompts.text(session, "What scopes do you want?");
   },
   function (session, results) {
-    if (!results.response) return session.endDialog();
+    if (!results.response) return endDialog(session);
     scopes = results.response.split(",").map(function(value){
       return value.trim().replace(/<.*?>/, "");
     });
@@ -38,7 +43,7 @@ bot.add('/google-oauth2',  [
     builder.Prompts.text(session, "Please go to "+url+" then parse your code here");
   },
   function (session, results) {
-    if (!results.response) return session.endDialog();
+    if (!results.response) return endDialog(session);
     oauth2Client = new OAuth2(session.userData.client_id, session.userData.client_secret, process.env.GOOGLE_OAUTH2_REDIRECT);
     oauth2Client.getToken(results.response, function(err, tokens){
       if (err) {
