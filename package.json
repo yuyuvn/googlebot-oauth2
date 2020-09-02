@@ -18,7 +18,7 @@
   "homepage": "https://github.com/yuyuvn/googlebot-oauth2#readme",
   "dependencies": {
     "botbuilder": "^0.9.2",
-    "googleapis": "^5.2.1",
+    "googleapis": "^59.0.0",
     "restify": "^4.0.4"
   }
 }
